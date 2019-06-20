@@ -3,26 +3,39 @@ import rospy, tf
 from gazebo_msgs.srv import *
 from geometry_msgs.msg import *
 import os
+from env.setup_world import SetupWorld
+import math
+import numpy as np
+from ackermann_msgs.msg import AckermannDriveStamped
+from sensor_msgs.msg import LaserScan
+
+
+pub = rospy.Publisher('/vesc/ackermann_cmd_mux/input/teleop', AckermannDriveStamped, queue_size=1)
+
+def callback(data):
+    msg = AckermannDriveStamped()
+    msg.header.stamp = rospy.Time.now()
+    msg.header.frame_id = "base_link"
+
+    msg.drive.speed = 1.0
+    msg.drive.acceleration = 1
+    msg.drive.jerk = 1
+    msg.drive.steering_angle = 0.0
+    msg.drive.steering_angle_velocity = 1
+    print("hello")
+
+    pub.publish(msg)
+
 
 if __name__ == '__main__':
     rospy.init_node('lec_control', anonymous=True)
-    rospy.wait_for_service("/gazebo/spawn_urdf_model")
-    orient = tf.transformations.quaternion_from_euler(0,0,0)
-    object_pose = Pose()
-    object_pose.position.x = float(0.0)
-    object_pose.position.y = float(0.0)
-    object_pose.position.z = float(0.5)
-    object_pose.orientation.x = orient[0] 
-    object_pose.orientation.y = orient[1] 
-    object_pose.orientation.z = orient[2] 
-    object_pose.orientation.w = orient[3]
-    file_location = "/home/feiyang/Desktop/current_work/f1tenth/sims_ws/src/racecar-simulator/racecar_description/urdf/racecar.xacro"
-    p = os.popen("rosrun xacro xacro.py " + file_location)
-    xml_string = p.read()
-    p.close()
-    srv_spawn_model = rospy.ServiceProxy("/gazebo/spawn_urdf_model", SpawnModel)
+    env = SetupWorld()
 
-    srv_spawn_model("racecar", xml_string, "", object_pose, "world" )
+    y = np.random.uniform(-0.5, 1.0)
+    yaw = np.random.uniform(-math.pi/6.0, math.pi/6.0)
+    position = [0.0, y, 0.05]
+    orientation = [0.0, 0.0, yaw]
+    env.reset(position, orientation)
 
-    print("Successfully initialize the control node")
+    rospy.Subscriber("scan",LaserScan,callback)
     rospy.spin()
