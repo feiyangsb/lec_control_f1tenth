@@ -9,6 +9,7 @@ class SetupVehicle():
         self.vehicle_xml_file = vehicle_xml_file
         p = os.popen("rosrun xacro xacro.py " + self.vehicle_xml_file)
         self.xml_string = p.read()
+        self.isVehicle = False
         p.close()
 
     def spawnVehicle(self, position, orientation):
@@ -31,6 +32,7 @@ class SetupVehicle():
         srv_delete_model = rospy.ServiceProxy("/gazebo/delete_model", DeleteModel)
         try:
             srv_delete_model("racecar")
+            print("hello, i tried to delete the vehicle")
         except rospy.ServiceException, e:
             pass
 
