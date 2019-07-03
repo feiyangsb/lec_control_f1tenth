@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<launch>
+
+  <node name="rl_control" pkg="lec_control" type="f1tenth.py" output="screen" />
+
+</launch>
