@@ -6,6 +6,7 @@ from rl_agent.CriticNetwork import CriticNetwork
 from rl_agent.OU import OU
 from rl_agent.ReplayBuffer import ReplayBuffer
 import json
+import math
 
 state_dim = 1081
 action_dim = 1
@@ -27,8 +28,8 @@ class ddpgAgent():
 
         self.actor = ActorNetwork(sess, state_dim, action_dim, BATCH_SIZE, TAU, LRA)
         try:
-            self.actor.model.load_weights("./saved_nn/success/actormodel.h5")
-            self.actor.target_model.load_weights("./saved_nn/success/actormodel.h5")
+            self.actor.model.load_weights(self.saved_model_directory +"/saved_nn/actormodel.h5")
+            self.actor.target_model.load_weights(self.saved_model_directory +"/saved_nn/actormodel.h5")
             print("Load actor model successfully")
         except:
             print("Cannot find actor weights in this directory")
@@ -38,8 +39,8 @@ class ddpgAgent():
             self.OU = OU()
             self.critic = CriticNetwork(sess, state_dim, action_dim, BATCH_SIZE, TAU, LRC)
             try:
-                self.critic.model.load_weights("./saved_nn/criticmodel.h5")
-                self.critic.target_model.load_weights("./saved_nn/criticmodel.h5")
+                self.critic.model.load_weights(self.saved_model_directory  + "/saved_nn/criticmodel.h5")
+                self.critic.target_model.load_weights(self.saved_model_directory  + "/saved_nn/criticmodel.h5")
                 print("Load critic model successfully")
             except:
                 print("Cannot find critic weights in this directory")
